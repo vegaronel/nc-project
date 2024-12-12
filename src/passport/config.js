@@ -20,7 +20,7 @@ passport.use(
     {
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: "/auth/google/callback", // Ensure this matches your Google Cloud configuration
+      callbackURL: `https://${process.env.DOMAIN}/auth/google/callback`, // Ensure this matches your Google Cloud configuration
     },
     (accessToken, refreshToken, profile, done) => {
       return done(null, profile);
