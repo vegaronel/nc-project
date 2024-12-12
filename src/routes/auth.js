@@ -2,7 +2,9 @@ import express from "express";
 import passport from "../components/passport-config.js";
 import checkAuth from "../middleware/authCheck.js";
 import pool from "../components/database-connection.js";
-
+import {config} from 'dotenv'
+config();
+const myLink = process.env.DOMAIN 
 import bcrypt from "bcrypt";
 const app = express();
 
@@ -165,7 +167,7 @@ app.get("/dashboard", checkAuth, async (req, res) => {
   // return res.send(`http://localhost:3000/send?user=${hashedUser}`);
   return res.render(`dashboard.ejs`, {
     user: req.user.displayName,
-    url: `https://nc-project-ycrc.onrender.com/send?user=${hashedUser}`,
+    url: `${myLink}/send?user=${hashedUser}`,
   });
 });
 
