@@ -15,21 +15,35 @@ const pool = new Pool({
 
 
 const init = async () => {
-  await pool.query(
-    `CREATE TABLE IF NOT EXISTS users
+  try {
+    // Create the users table if it doesn't exist
+    const createUsersTable = await pool.query(`
+      CREATE TABLE IF NOT EXISTS users
         (id SERIAL PRIMARY KEY, "displayName" TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,type TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE) `
-  );
-  await pool.query(`
-        CREATE TABLE IF NOT EXISTS messages (
-    id SERIAL PRIMARY KEY,
-    "displayName" TEXT NOT NULL,
-    message TEXT NOT NULL,
-    room TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
-);
-`); 
+        password TEXT NOT NULL, type TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE)
+    `);
+    console.log('Users table created or already exists');
+  } catch (err) {
+    console.error('Error creating users table:', err);
+  }
+
+  try {
+    // Create the messages table if it doesn't exist
+    const createMessagesTable = await pool.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        "displayName" TEXT NOT NULL,
+        message TEXT NOT NULL,
+        room TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    console.log('Messages table created or already exists');
+  } catch (err) {
+    console.error('Error creating messages table:', err);
+  }
 };
 init();
+
 export default pool;
