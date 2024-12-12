@@ -32,7 +32,7 @@ app.get("/send", checkAuth, async (req, res) => {
   if (receiver_id && sender_id ) {    
     return res.render("anonymous.ejs", {
       user: req.user.displayName,
-      url: `http://localhost:3000/send?user=${hashedUser}`,
+      url: `https://nc-project-ycrc.onrender.com/send?user=${hashedUser}`,
       sender: sender_id,
       receiver: receiver_id,
     });
