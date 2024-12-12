@@ -15,18 +15,18 @@ const pool = new Pool({
 
 const init = async () => {
   try {
-    // Create the users table if it doesn't exist
     const createUsersTable = await pool.query(`
-      CREATE TABLE IF NOT EXISTS users
-        (   id SERIAL PRIMARY KEY,
-    "displayName" TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL,
-    type TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE)
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        "displayName" TEXT NOT NULL,
+        password TEXT NOT NULL,
+        type TEXT NOT NULL,
+        email TEXT DEFAULT '' -- Allow empty string as default
+      )
     `);
-    console.log("Users table created or already exists");
+    console.log('Users table created or already exists');
   } catch (err) {
-    console.error("Error creating users table:", err);
+    console.error('Error creating users table:', err);
   }
 
   try {
