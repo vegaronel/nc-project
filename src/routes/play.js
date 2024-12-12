@@ -2,6 +2,9 @@ import express from "express";
 import pool from "../components/database-connection.js";
 import bcypt from "bcrypt";
 import checkAuth from "../middleware/authCheck.js";
+import {config} from 'dotenv'
+config();
+const myLink = process.env.DOMAIN 
 const app = express.Router();
 
 const QUESTION = [
@@ -32,7 +35,7 @@ app.get("/send", checkAuth, async (req, res) => {
   if (receiver_id && sender_id ) {    
     return res.render("anonymous.ejs", {
       user: req.user.displayName,
-      url: `https://nc-project-ycrc.onrender.com/send?user=${hashedUser}`,
+      url: `${myLink}/send?user=${hashedUser}`,
       sender: sender_id,
       receiver: receiver_id,
     });
@@ -74,7 +77,7 @@ app.get("/dashboard/message", checkAuth, async (req, res) => {
   
   return res.render("dashboardMessage.ejs", {
     user: req.user.displayName,
-    url: `http://localhost:3000/send?user=${hashedUser}`,
+    url: `${myLink}/send?user=${hashedUser}`,
     inbox: messages,
     ownName: req.user.displayName
   });
