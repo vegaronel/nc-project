@@ -3,7 +3,7 @@ const { Pool } = pkg;
 import { config } from "dotenv";
 config();
 // Detect environment and configure database URL
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 const connectionString = isProduction
   ? process.env.DATABASE_URL
   : `postgresql://${process.env.db_User}:${process.env.db_Password}@${process.env.db_Host}:${process.env.db_Port}/${process.env.db_Database}`;
@@ -13,19 +13,20 @@ const pool = new Pool({
   ssl: isProduction ? { rejectUnauthorized: false } : false, // SSL only in production
 });
 
-
 const init = async () => {
   try {
     // Create the users table if it doesn't exist
     const createUsersTable = await pool.query(`
       CREATE TABLE IF NOT EXISTS users
-        (id SERIAL PRIMARY KEY, "displayName" TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL, type TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE)
+        (   id SERIAL PRIMARY KEY,
+    "displayName" TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    type TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE)
     `);
-    console.log('Users table created or already exists');
+    console.log("Users table created or already exists");
   } catch (err) {
-    console.error('Error creating users table:', err);
+    console.error("Error creating users table:", err);
   }
 
   try {
@@ -39,9 +40,9 @@ const init = async () => {
         created_at TIMESTAMP DEFAULT NOW()
       )
     `);
-    console.log('Messages table created or already exists');
+    console.log("Messages table created or already exists");
   } catch (err) {
-    console.error('Error creating messages table:', err);
+    console.error("Error creating messages table:", err);
   }
 };
 init();

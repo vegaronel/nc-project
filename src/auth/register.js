@@ -7,36 +7,34 @@ const app = express();
 app.get("/register", (req, res) => {
   res.render("signup.ejs");
 });
-// REGISTER NEW USER
 app.post("/register", async (req, res) => {
   try {
-    const { displayName, password } = req.body;
+    const { displayName, email, password } = req.body;
 
     if (!displayName || !password) {
       return res.status(400).send("Missing required fields.");
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 5);
-    const values = [displayName, hashedPassword, "local", ""]; // Assuming email is left blank for now
-
-    // Check if the username (displayName) already exists
+    // Check if the username or email already exists
     const checkUser = await pool.query(
-      "SELECT * FROM users WHERE displayName = $1",  // Fixed column reference
-      [displayName]
+      'SELECT * FROM users WHERE "displayName" = $1 OR email = $2',
+      [displayName, email || '']
     );
 
     if (checkUser.rowCount > 0) {
-      return res.send({
+      return res.status(400).send({
         status: "failed",
-        msg: "Username already exists!",
+        msg: "Username or email already exists!",
       });
     }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 5);
 
     // Insert the new user into the database
     const response = await pool.query(
       'INSERT INTO users ("displayName", password, type, email) VALUES($1, $2, $3, $4) RETURNING *',
-      values
+      [displayName, hashedPassword, "local", email || '']
     );
 
     // Redirect after successful registration
@@ -46,7 +44,7 @@ app.post("/register", async (req, res) => {
     console.error("Error during registration:", err);
 
     // Send an error response to the client
-    if (err.code === '23505') {  // 23505 is the unique violation error code
+    if (err.code === '23505') {  // Unique constraint violation
       return res.status(400).send({
         status: "failed",
         msg: "Username or Email already exists!",
