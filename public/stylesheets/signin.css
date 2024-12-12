@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+@import url('https://fonts.cdnfonts.com/css/revamped');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #1A1A1A;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-image: url('/img/signinbg.png');
+    background-size: cover;
+    background-position: center left;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #ffffff;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    text-align: left;
+}
+
+.form-control {
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+}
+
+.form-control:focus {
+    outline: none;
+    box-shadow: 0 0 5px #ff4500;
+}
+
+
+form {
+    text-align: left;
+}
+
+
+.login-container {
+    background-color: #d9d9d929;
+    padding: 20px 50px;
+    border-radius: 5px;
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+}
+
+
+.form-control:focus {
+    outline: none;
+    box-shadow: 0 0 5px #ff4500;
+}
+
+.btn-primary {
+    background-color: #ff4500;
+    border: none;
+    font-size: 1.1rem;
+    border-radius: 5px;
+}
+
+.btn-primary:hover {
+    background-color: #ff5722;
+}
+
+.text-link {
+    color: #FF0000;
+    text-decoration: none;
+}
+
+.text-link:hover {
+    text-decoration: underline;
+    color: #000000;
+}
+.text-link1 {
+    color: #C8C8C8;
+    text-decoration: none;
+}
+
+.text-link:hover1 {
+    text-decoration: underline;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #cccccc;
+}
+
+.divider:not(:empty)::before {
+    margin-right: .5em;
+}
+
+.divider:not(:empty)::after {
+    margin-left: .5em;
+}
+
+.title{
+    color: #FE3C2F;
+    text-align: left;
+}
+.sub-title{
+    color: #E4E4E4;
+    text-align: left;
+}
+.login-btn {
+    width: 100%;
+    max-width: 280px;
+    height: 42px;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #FF0000, #FD692E);
+    color: #ffffff;
+    border: none;
+    font-family: "Poppins", serif;
+    font-weight: 600;
+    font-style: normal;
+    letter-spacing: 0.32px;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .login-btn {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .login-btn {
+        font-size: 0.8rem;
+    }
+}
+
+.google-btn {
+    width: 100%;
+    max-width: 200px;
+    height: 36px;
+    border-radius: 18px;
+    background: #E9E9E9;
+    color: #322E2E;
+    border-color: #5E0600;
+    font-size: 13px;
+    font-family: "Poppins", serif;
+    font-style: normal;
+}
+.divider-container{
+    width: 100%;
+    max-width: 450px;
+}
+.title-container{
+    width: 100%;
+    max-width: 450px;
+}

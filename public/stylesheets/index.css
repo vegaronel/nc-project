@@ -1,0 +1,52 @@
+:root{
+    --bg-grey: #1A1A1A;
+}
+
+*{
+    padding: 0;
+    height: 0;
+    box-sizing: border-box;
+}
+
+html,body{
+    width: 100%;
+    height: 100%;
+}
+
+main{
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-grey);
+}
+
+.red-circle{
+    width: 1300px;
+    height: 100%;
+    position: absolute;
+    transform: translateY(-300px);
+    left: -500px;
+    animation: neon_load 0.5s ease-in;
+
+}
+
+.neon{
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    right: 0;
+    animation: neon_load 0.5s ease-in;
+}
+
+
+@keyframes neon_load {
+    0%{
+        opacity: 0;
+    }
+    50%{
+        opacity: 0.5;
+    }
+
+    100%{
+        opacity: 1;
+    }
+}

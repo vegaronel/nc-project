@@ -1,0 +1,38 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "jquery": "^3.7.1",
+    "nodemon": "^3.1.7",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.13.1",
+    "ps": "^1.0.0",
+    "socket.io": "^4.8.1",
+    "sweetalert2": "^11.14.5"
+  },
+  "type": "module",
+  "name": "nc_101_anonymous_project",
+  "version": "1.0.0",
+  "description": "This is a project requirement in NC 101 (Ian Godwin Agapit0)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Speedy-Code-Tech/anonymous_messaging_nc_project.git"
+  },
+  "author": "BSCS IV - A",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Speedy-Code-Tech/anonymous_messaging_nc_project/issues"
+  },
+  "homepage": "https://github.com/Speedy-Code-Tech/anonymous_messaging_nc_project#readme"
+}

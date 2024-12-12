@@ -1,0 +1,112 @@
+<%- include("./partials/dashboardHeader.ejs") %>
+
+<main>
+  <div
+    class="container-fluid red-border-top d-flex align-items-center pt-5 flex-column"
+    style="height: 100vh"
+  >
+    <!-- <form id="message-form"> -->
+    <div class="union d-flex justify-content-center align-items-center flex-column">
+      <div style="max-width: 350px">
+        <p class="text-center h3 ff-inter">Send him/her anonymous message</p>
+        <input id="message-input" class="form-control my-4" name="message" type="text" />
+        <input type="hidden" id="sender" value="<%= sender %>" />
+        <input type="hidden" id="room" name="receiver" value="<%= sender+"-"+receiver %>" />
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-3 m-5">
+      <p>Generated Link</p>
+      <div class="d-flex align-items-center border border-1 url-container">
+        <div class="red-box-icon border-end border-1 py-1 px-3">
+          <img class="copys" src="/img/paper-icon.png" alt="asdasd" />
+        </div>
+        <div class="pe-2">
+          <p class="px-3 link1" style="width: 200px; overflow-x: hidden; text-wrap: nowrap">
+            <%= url %>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="conatiner-fluid text-center">
+      <button id="submit" onclick="submit()" class="btn text-white mt-3 share-btn">Reply</button>
+    </div>
+    <!-- </form> -->
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  // Send username to the server
+  const sender = document.getElementById("sender").value;
+  const result = document.getElementById("room").value;
+  const room = result.replace(/\s+/g, "").toLowerCase();
+  socket.emit("set username", { username: sender, room });
+
+  // Listen for incoming messages
+  socket.on("message", (data) => {
+    const chatContainer = document.getElementById("chat-container");
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("message");
+    messageElement.innerHTML = `<span>${data.username}:</span> ${data.message}`;
+    chatContainer.appendChild(messageElement);
+
+    // Scroll to the bottom of the chat
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  });
+
+  // Send message to the server
+  const messageForm = document.getElementById("submit");
+  const messageInput = document.getElementById("message-input");
+  const submit = () => {
+    // alert("Success");
+    const message = messageInput.value;
+    if (message.trim() !== "") {
+      socket.emit("message", { message, room }); // Send message to server
+      messageInput.value = ""; // Clear the input field
+      Swal.fire({
+        icon: "success",
+        title: "Message Sent",
+        text: "Your message was sent successfully!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        window.location.href = "/dashboard"; // Redirect after the alert disappears
+      }, 1500);
+    }
+  };
+</script>
+<script>
+  let copylink1 = document.querySelector(".copys");
+  copylink1.addEventListener("click", function () {
+    const link2 = document.querySelector(".link1").textContent;
+
+    navigator.clipboard
+      .writeText(link2)
+      .then(() => {
+        // Use SweetAlert for success notification
+        Swal.fire({
+          icon: "success",
+          title: "Link Copied!",
+          text: "The link has been copied to your clipboard.",
+          timer: 2000, // Auto-close after 2 seconds
+          showConfirmButton: false,
+        });
+      })
+      .catch((err) => {
+        // Use SweetAlert for error notification
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Copy",
+          text: "An error occurred while copying the link. Please try again.",
+        });
+        console.error("Error copying link:", err);
+      });
+  });
+</script>
+
+<%- include("./partials/dashboardFooter.ejs") %>

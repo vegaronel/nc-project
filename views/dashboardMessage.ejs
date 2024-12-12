@@ -1,0 +1,222 @@
+<%- include("./partials/dashboardHeader.ejs") %>
+
+<style>
+  /* Chat box scrollbar styles */
+  .chat-box {
+    overflow-y: scroll;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #d9463b #f0f0f0; /* Firefox */
+  }
+
+  /* Webkit browsers (Chrome, Safari, etc.) */
+  .chat-box::-webkit-scrollbar {
+    width: 10px; /* Adjust scrollbar width */
+  }
+
+  .chat-box::-webkit-scrollbar-thumb {
+    background-color: #d9463b; /* Scrollbar thumb color */
+    border-radius: 10px;
+    border: 2px solid #f0f0f0; /* Optional border */
+  }
+
+  .chat-box::-webkit-scrollbar-track {
+    background-color: #f0f0f0; /* Scrollbar track color */
+    border-radius: 10px;
+  }
+  #typingIndicator {
+    /* display: none; */
+  }
+</style>
+
+<main>
+  <div class="container-fluid red-border-top">
+    <div class="row">
+      <!-- Inbox Section -->
+      <div
+        id="messages"
+        class="col-lg-3 bg-warning inbox-card d-flex flex-column align-items-center"
+        style="position: relative; overflow: auto"
+      >
+        <div style="overflow: auto; height: 550px; max-width: 400px">
+          <p class="h4 text-center m-4">Inbox</p>
+          <span class="text-center" style="color: whitesmoke">
+            -- Refresh to load new messages --
+          </span>
+          <% inbox.forEach(element => { %>
+          <div
+            id="message-id"
+            class="d-flex gap-2 justify-content-between align-items-center p-2 mt-2 inbox not-read"
+            onclick="view('<%=element.room%>')"
+          >
+            <img src="/img/email-icon.png" alt="Email icon" />
+            <div class="text-card">
+              <p class="limited-text white-text bold"><%= element.message %></p>
+              <small class="light-text"><%= element.timeAgo %></small>
+            </div>
+            <img src="/img/right-arrow.png" alt="Arrow icon" />
+          </div>
+          <% }) %>
+        </div>
+        <div class="justify-self-end">
+          <a href="#"><button class="btn text-white">Clear</button></a>
+        </div>
+      </div>
+
+      <!-- Chat Section -->
+      <div id="chatContainer" class="col message-box d-grid align-items-end d-none">
+        <div class="chat-container">
+          <!-- Chat Header -->
+          <div class="chat-header p-1 d-flex align-items-center justify-content-between px-3">
+            <div class="d-flex align-items-center gap-2">
+              <img style="opacity: 60%;"
+                id="navProfilePicture"
+                src="/img/user.png"
+                alt="Profile"
+              />
+              <p>Anonymous <span class="conversation-text">Conversation</span></p>
+            </div>
+            <a href="javascript:void(0)" onclick="hideChat()"><i class="fas fa-times"></i></a>
+          </div>
+
+          <!-- Chat Box -->
+          <div class="chat-box"></div>
+          <p id="typingIndicator" class="text-center px-3" style="color: gray"></p>
+          <!-- Message Input Section -->
+          <div class="d-flex p-3">
+            <input
+              name="message"
+              type="text"
+              id="msg"
+              class="form-control me-2 users-message"
+              placeholder="Type a message..."
+            />
+            <input type="hidden" name="receiver" id="receiver" />
+            <input type="hidden" id="ownName" value="<%= ownName %>" />
+            <button id="submit" class="btn p-0 m-0" disabled>
+              <img src="/img/send.png" alt="Send" width="45" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  let typingTimeout;
+
+  // Join room and fetch messages
+  function view(room) {
+    const chatContainer = document.getElementById("chatContainer");
+
+    // Ensure the chat container is shown
+    if (chatContainer.classList.contains("d-none")) {
+      chatContainer.classList.remove("d-none"); // Show the chat container
+    }
+
+    // Set the receiver room
+    document.getElementById("receiver").value = room;
+
+    // Clear the chat box content
+    const chatBox = document.querySelector(".chat-box");
+    chatBox.innerHTML = "";
+
+    console.log("Joining room:", room);
+
+    // Emit socket events
+    socket.emit("joinRoom", room);
+    socket.emit("fetchRoomMessages", room);
+  }
+
+  // Listen for room messages and render them
+  socket.on("roomMessages", (messages) => {
+    const chatBox = document.querySelector(".chat-box");
+    const ownName = document.getElementById("ownName").value;
+
+    messages.forEach((msg) => {
+      const bubble = document.createElement("div");
+      bubble.className = `chat-bubble ${msg.sender === ownName ? "outgoing" : "incoming"}`;
+      bubble.innerHTML = `
+        <p>${msg.message}</p>
+        <small class="timestamp">${new Date(msg.created_at).toLocaleString()}</small>
+      `;
+      chatBox.appendChild(bubble);
+    });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+
+  // Listen for individual message updates
+  socket.on("message", (data) => {
+    const chatBox = document.querySelector(".chat-box");
+    const ownName = document.getElementById("ownName").value;
+
+    const bubble = document.createElement("div");
+    bubble.className = `chat-bubble ${data.sender === ownName ? "outgoing" : "incoming"}`;
+    bubble.innerHTML = `
+      <p>${data.message}</p>
+      <small class="timestamp">${new Date(data.created_at).toLocaleString()}</small>
+    `;
+    chatBox.appendChild(bubble);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+  let typingIndicator = document.getElementById("typingIndicator");
+
+  socket.on("typing", () => {
+    console.log("Typing event received for room.");
+    typingIndicator.innerText = "Anonymous is typing...";
+    typingIndicator.style.display = "block";
+  });
+
+  socket.on("stopTyping", () => {
+    typingIndicator.style.display = "none";
+  });
+
+  // Message input behavior
+  const messageInput = document.getElementById("msg");
+  const submitButton = document.getElementById("submit");
+
+  messageInput.addEventListener("input", () => {
+    const room = document.getElementById("receiver").value;
+    const isInputEmpty = !messageInput.value.trim();
+    submitButton.disabled = isInputEmpty;
+
+    socket.emit("typing", { room });
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      socket.emit("stopTyping", { room });
+    }, 1000);
+  });
+
+  // Send message on button click
+  submitButton.addEventListener("click", () => {
+    const message = messageInput.value.trim();
+    const room = document.getElementById("receiver").value;
+
+    if (message) {
+      socket.emit("message", { message, room });
+      messageInput.value = "";
+      submitButton.disabled = true;
+    }
+  });
+
+  // Enable sending with Enter key
+  messageInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      submitButton.click();
+    }
+  });
+  function hideChat() {
+    const chatContainer = document.getElementById("chatContainer");
+
+    // Hide the chat container using Bootstrap's d-none class
+    if (!chatContainer.classList.contains("d-none")) {
+      chatContainer.classList.add("d-none");
+    }
+  }
+</script>
+
+<%- include("./partials/dashboardFooter.ejs") %>

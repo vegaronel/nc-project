@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tell No One</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/stylesheets/dashboard.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="p-0 m-0 nav-text">
+        <div
+          class="container-fluid d-flex justify-content-between"
+          style="min-height: 90px"
+        >
+          <div class="d-flex align-items-center">
+            <!-- Mobile Toggle Button -->
+            <button
+              class="mobile-toggle"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#mobileMenuModal"
+            >
+              <i class="fa-solid fa-bars p-1" style="font-size: 20px"></i>
+            </button>
+            <a class="tell-no-one me-3 mx-3" href="">TELL NO ONE</a>
+          </div>
+
+          <div
+            class="full-nav-content d-flex gap-5 justify-content-between align-items-start"
+            style="height: 100%"
+          >
+            <div class="align-self-end p-2">
+              <a class="white-50" href="">Developers</a>
+            </div>
+
+            <div class="mx-5">
+              <div class="d-flex flex-column justify-content-between">
+                <div class="border-button-group"></div>
+                <div class="d-flex button-card">
+                  <a href="/dashboard">
+                    <button id="playButton" class="btn play-btn">
+                      Play
+                    </button></a
+                  >
+                  <a href="/dashboard/message">
+                    <button id="chatboxButton" class="btn red-button">
+                      Chatbox
+                    </button></a
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="align-self-end">
+              <div
+                class="d-flex align-items-center border border-1 url-container"
+              >
+                <div class="red-box-icon border-end border-1 py-1 px-3" style="cursor: pointer;">
+                  <img
+                    class="copy-btn"
+                    src="/img/paper-icon.png"
+                    alt="asdasd"
+                    
+                  />
+                </div>
+                <div>
+                  <p
+                    class="px-3 me-2 link"
+                    style="width: 200px; overflow-x: hidden; text-wrap: nowrap"
+                  >
+                    <%= url%>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <div class="profile-container me-2 d-lg-block">
+              <p>Hey, <%=user%></p>
+            </div>
+            <div class="dropdown">
+              <button
+                class="btn"
+                id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <img
+                  id="navProfilePicture"
+                  src="/img/user.png"
+                  alt="profile"
+                />
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="dropdownMenuButton"
+              >
+                <li id="logout" class="px-3" style="color: #1a1a1a; cursor: pointer;">Logout</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Mobile Menu Modal -->
+    <div
+      class="modal fade"
+      id="mobileMenuModal"
+      tabindex="-1"
+      aria-labelledby="mobileMenuModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content" style="background-color: #1a1a1a">
+          <div class="modal-header border-bottom-0">
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div
+            class="modal-body d-flex flex-column align-items-center justify-content-center text-center"
+          >
+         
+            <div class="mb-3">
+              <div class="border-button-group mb-2"></div>
+              <div class="d-flex button-card">
+                <a href="/dashboard">
+                  <button id="playButton" class="btn play-btn">Play</button></a
+                >
+                <a href="/dashboard/message">
+                  <button id="chatboxButton" class="btn red-button">
+                    Chatbox
+                  </button></a
+                >
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div
+                class="d-flex justify-content-center align-items-center border border-1 rounded url-container"
+              >
+                <div class="red-button border-end border-1 py-2 px-3 rounded" style="cursor: pointer;">
+                  <img
+                    class="copy-btnlast"
+                    src="/img/paper-icon.png"
+                    alt="asdasd"
+                    style="cursor: pointer;"
+                  />
+                </div>
+                <div>
+                  <p
+                    class="px-3 me-2 linklast"
+                    style="width: 200px; overflow-x: hidden; text-wrap: nowrap"
+                  >
+                  
+                    <%= url%>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+   let copybtnlast = document.querySelector(".copy-btnlast");
+   copybtnlast.addEventListener("click", function () {
+    const linklast = document.querySelector(".linklast").textContent;
+
+    navigator.clipboard
+      .writeText(linklast)
+      .then(() => {
+        // Use SweetAlert for success notification
+        Swal.fire({
+          icon: "success",
+          title: "Link Copied!",
+          text: "The link has been copied to your clipboard.",
+          timer: 2000, // Auto-close after 2 seconds
+          showConfirmButton: false,
+        });
+      })
+      .catch((err) => {
+        // Use SweetAlert for error notification
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Copy",
+          text: "An error occurred while copying the link. Please try again.",
+        });
+        console.error("Error copying link:", err);
+      });
+  });
+
+  let copylinks = document.querySelector(".copy-btn");
+  copylinks.addEventListener("click", function () {
+    const links = document.querySelector(".link").textContent;
+
+    navigator.clipboard
+      .writeText(links)
+      .then(() => {
+        // Use SweetAlert for success notification
+        Swal.fire({
+          icon: "success",
+          title: "Link Copied!",
+          text: "The link has been copied to your clipboard.",
+          timer: 2000, // Auto-close after 2 seconds
+          showConfirmButton: false,
+        });
+      })
+      .catch((err) => {
+        // Use SweetAlert for error notification
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Copy",
+          text: "An error occurred while copying the link. Please try again.",
+        });
+        console.error("Error copying link:", err);
+      });
+  });
+
+
+  let logout = document.getElementById('logout')
+  logout.addEventListener('click',()=>{
+     
+     Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out of your account.",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Logout",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Make a request to the backend logout route
+        fetch("/logout", {
+          method: "GET"
+        })
+          .then((response) => {
+            if (response.ok) {
+              Swal.fire("Logged Out!", "You have been logged out.", "success").then(() => {
+                window.location.href = "/"; // Redirect to the homepage
+              });
+            } else {
+              Swal.fire("Error!", "Failed to log out. Please try again.", "error");
+            }
+          })
+          .catch((error) => {
+            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+          });
+      }
+    });
+  })
+</script>
