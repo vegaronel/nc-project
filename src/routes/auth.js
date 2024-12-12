@@ -165,7 +165,7 @@ app.get("/dashboard", checkAuth, async (req, res) => {
   // return res.send(`http://localhost:3000/send?user=${hashedUser}`);
   return res.render(`dashboard.ejs`, {
     user: req.user.displayName,
-    url: `http://localhost:3000/send?user=${hashedUser}`,
+    url: `https://nc-project-ycrc.onrender.com/send?user=${hashedUser}`,
   });
 });
 
