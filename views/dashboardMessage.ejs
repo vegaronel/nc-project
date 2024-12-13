@@ -26,6 +26,11 @@
   #typingIndicator {
     /* display: none; */
   }
+  #chatContainer, #messages {
+  transition: all 0.3s ease-in-out;
+}
+
+
 </style>
 
 <main>
@@ -33,38 +38,36 @@
     <div class="row">
       <!-- Inbox Section -->
       <div
-        id="messages"
-        class="col-lg-3 bg-warning inbox-card d-flex flex-column align-items-center"
-        style="position: relative; overflow: auto"
-      >
-        <div style="overflow: auto; height: 550px; max-width: 400px">
-          <p class="h4 text-center m-4">Inbox</p>
-          <span class="text-center" style="color: whitesmoke">
-            -- Refresh to load new messages --
-          </span>
-          <% inbox.forEach(element => { %>
-          <div
-            id="message-id"
-            class="d-flex gap-2 justify-content-between align-items-center p-2 mt-2 inbox not-read"
-            onclick="view('<%=element.room%>')"
-          >
-            <img src="/img/email-icon.png" alt="Email icon" />
-            <div class="text-card">
-              <p class="limited-text white-text bold"><%= element.message %></p>
-              <small class="light-text"><%= element.timeAgo %></small>
-            </div>
-            <img src="/img/right-arrow.png" alt="Arrow icon" />
+      id="messages"
+      class="col-lg-3 bg-warning inbox-card d-flex flex-column align-items-center d-md-block "
+      style="position: relative; overflow: auto;"
+    >
+      <div style="overflow: auto; height: 550px; max-width: 400px;">
+        <p class="h4 text-center m-4">Inbox</p>
+        <span class="text-center" style="color: whitesmoke">
+          -- Refresh to load new messages --
+        </span>
+        <% inbox.forEach(element => { %>
+        <div
+          id="message-id"
+          class="d-flex gap-2 justify-content-between align-items-center p-2 mt-2 inbox not-read"
+          onclick="view('<%=element.room%>')"
+        >
+          <img src="/img/email-icon.png" alt="Email icon" />
+          <div class="text-card">
+            <p class="limited-text white-text bold"><%= element.message %></p>
+            <small class="light-text"><%= element.timeAgo %></small>
           </div>
-          <% }) %>
+          <img src="/img/right-arrow.png" alt="Arrow icon" />
         </div>
-        <div class="justify-self-end">
-          <a href="#"><button class="btn text-white">Clear</button></a>
-        </div>
+        <% }) %>
       </div>
+    </div>
+    
 
       <!-- Chat Section -->
-      <div id="chatContainer" class="col message-box d-grid align-items-end d-none">
-        <div class="chat-container">
+      <div id="chatContainer" class="col message-box d-none" style="position: relative;">
+        <div class="chat-container" style=" ">
           <!-- Chat Header -->
           <div class="chat-header p-1 d-flex align-items-center justify-content-between px-3">
             <div class="d-flex align-items-center gap-2">
@@ -75,7 +78,7 @@
               />
               <p>Anonymous <span class="conversation-text">Conversation</span></p>
             </div>
-            <a href="javascript:void(0)" onclick="hideChat()"><i class="fas fa-times"></i></a>
+            <a href="javascript:void(0)" onclick="showInbox()"><i class="fas fa-times"></i></a>
           </div>
 
           <!-- Chat Box -->
@@ -109,26 +112,41 @@
 
   // Join room and fetch messages
   function view(room) {
-    const chatContainer = document.getElementById("chatContainer");
+  const chatContainer = document.getElementById("chatContainer");
+  const inbox = document.getElementById("messages");
 
-    // Ensure the chat container is shown
-    if (chatContainer.classList.contains("d-none")) {
-      chatContainer.classList.remove("d-none"); // Show the chat container
-    }
+  // Show the chat container
+  chatContainer.classList.remove("d-none");
 
-    // Set the receiver room
-    document.getElementById("receiver").value = room;
-
-    // Clear the chat box content
-    const chatBox = document.querySelector(".chat-box");
-    chatBox.innerHTML = "";
-
-    console.log("Joining room:", room);
-
-    // Emit socket events
-    socket.emit("joinRoom", room);
-    socket.emit("fetchRoomMessages", room);
+  // Hide the inbox on medium or smaller screens
+  if (window.innerWidth < 992) {
+    inbox.classList.add("d-none");
   }
+
+  // Set the receiver room
+  document.getElementById("receiver").value = room;
+
+  // Clear the chat box content
+  const chatBox = document.querySelector(".chat-box");
+  chatBox.innerHTML = "";
+
+  console.log("Joining room:", room);
+
+  // Emit socket events
+  socket.emit("joinRoom", room);
+  socket.emit("fetchRoomMessages", room);
+}
+
+
+function showInbox() {
+  const chatContainer = document.getElementById("chatContainer");
+  const inbox = document.getElementById("messages");
+
+  // Show the inbox and hide the chat container
+  inbox.classList.remove("d-none");
+  chatContainer.classList.add("d-none");
+}
+
 
   // Listen for room messages and render them
   socket.on("roomMessages", (messages) => {
