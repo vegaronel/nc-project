@@ -18,6 +18,8 @@
                     <p>Join our community and let's get started.</p>
                  <form action="/signup" method="POST">
                     <div class="signup-box">
+              <span id="error-message" style="text-align: center; color: #FE1609; width: 100%;"><%= msgs %></span>
+               <input type="hidden" name="link" value="<%= link %>">
         
                     <div class="glass-effect">
                          <label for="displayName">Create Username</label>

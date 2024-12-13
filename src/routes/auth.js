@@ -2,9 +2,9 @@ import express from "express";
 import passport from "../components/passport-config.js";
 import checkAuth from "../middleware/authCheck.js";
 import pool from "../components/database-connection.js";
-import {config} from 'dotenv'
+import { config } from "dotenv";
 config();
-const myLink = process.env.DOMAIN 
+const myLink = process.env.DOMAIN;
 import bcrypt from "bcrypt";
 const app = express();
 
@@ -12,12 +12,22 @@ app.get("/", (re, res) => {
   return res.render("landing-page.ejs");
 });
 
-app.get("/signup", (re, res) => {
-  return res.render("signup.ejs");
+app.get("/signup", (req, res) => {
+  let link = "";
+  if (req.query.redirectedTo) {
+    link = req.query.redirectedTo;
+  }
+  // console.log(link)
+
+  return res.render("signup.ejs", {
+    // status: "failed",
+    msgs: "",
+    link:link
+  });
 });
 
 app.get("/signin", (re, res) => {
-  return res.render("signin.ejs",{link:null});
+  return res.render("signin.ejs", { link: null });
 });
 
 // Google OAuth Routes
@@ -27,8 +37,7 @@ app.get("/google", (req, res) => {
 
 app.get(
   "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] }),
-  
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 app.get(
@@ -39,7 +48,7 @@ app.get(
       console.log(req.user);
       const { displayName } = req.user;
       const email = req.user.emails[0].value;
-      console.log("Google",req.url)
+      console.log("Google", req.url);
       const checkData = await pool.query(
         "SELECT * FROM users WHERE email = $1",
         [email]
@@ -54,9 +63,9 @@ app.get(
       }
 
       const redirectTo = req.session.redirectTo || "/dashboard"; // Default to dashboard
-      
+
       delete req.session.redirectTo; // Clear the session variable
-    
+
       res.redirect(redirectTo); // Redirect the user
     } catch (error) {
       console.error("Error in Google OAuth callback:", error.message);
@@ -72,7 +81,7 @@ app.get("/login", (req, res) => {
     link = req.query.redirectedTo;
   }
   // console.log(req.query.redirectedTo)
-  res.render("signin.ejs", { link: link});
+  res.render("signin.ejs", { link: link, error: "" });
 });
 
 app.post("/login", (req, res, next) => {
@@ -92,10 +101,10 @@ app.post("/login", (req, res, next) => {
         console.error("Login error:", loginErr.message);
         return res.status(500).send("Internal Server Error");
       }
-      console.log("QUERY", req.query);  // Log query parameters for debugging
+      console.log("QUERY", req.query); // Log query parameters for debugging
 
       // Default redirect
-      const redirectTo = "/dashboard"; 
+      const redirectTo = "/dashboard";
 
       // Check for the 'user' parameter in the query string
       const { redirectedTo, user: userFromQuery } = req.query;
@@ -103,58 +112,89 @@ app.post("/login", (req, res, next) => {
         // If 'user' parameter exists, redirect to '/send?user=' with the value
         return res.redirect(`/send?user=${userFromQuery}`);
       }
-      if(req.body.user){
+      if (req.body.user) {
         return res.redirect(req.body.user);
-
-      }else{
+      } else {
         return res.redirect(redirectTo);
-
       }
-      console.log(req.body)
+      console.log(req.body);
       // Otherwise, redirect to default route
     });
   })(req, res, next);
 });
+app.get("/signup/send",async(req,res)=>{
+      return res.render("signup.ejs", {
+        // status: "failed",
+        msgs: "MIssing Required Fields",
+        link:req.query.user,
+      });
 
-
-
+})
 app.post("/signup", async (req, res) => {
   try {
-    const { displayName, password } = req.body;
-
+    const { displayName, password,link } = req.body;
     if (!displayName || !password) {
-      return res.status(400).send("Missing required fields.");
+      return res.render("signup.ejs", {
+        // status: "failed",
+        msgs: "MIssing Required Fields",
+        link:link
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 5);
     const values = [displayName, hashedPassword, "local", ""];
 
     const checkUser = await pool.query(
-      "SELECT * FROM users WHERE 'displayName' = $1",
+      "SELECT * FROM users WHERE \"displayName\" = $1",
       [displayName]
     );
-
+    console.log("Database", checkUser.rows);
     if (checkUser.rowCount > 0) {
-      return res.send({
-        status: "failed",
-        msg: "Username already exists!",
+      return res.render("signup.ejs", {
+        // status: "failed",
+        msgs: "Username already exists!",
+        link:link
+
       });
     }
-
     const response = await pool.query(
       'INSERT INTO users ("displayName", password, type, email) VALUES($1, $2, $3, $4) RETURNING *',
       values
     );
+    console.log("My QUERY", req.query); // Log query parameters for debugging
+
+    //   // Default redirect
+    //   const redirectTo = "/dashboard";
+
+    //   // Check for the 'user' parameter in the query string
+    //   const { redirectedTo, user: userFromQuery } = req.query;
+    //   if (userFromQuery) {
+    //     // If 'user' parameter exists, redirect to '/send?user=' with the value
+    //     return res.redirect(`/send?user=${userFromQuery}`);
+    //   }
+    //   if (req.body.user) {
+    //     return res.redirect(req.body.user);
+    //   } else {
+    //     return res.redirect(redirectTo);
+    //   }
 
     // res.send({
     //   status: "success",
     //   msg: "Registration Successful",
     //   data: response.rows[0],
     // });
+    if(link)
+    res.redirect("/login?redirectedTo=/send?user="+link);
+    else
     res.redirect("/login");
+
   } catch (error) {
     console.error("Registration error:", error.message);
-    res.status(500).send("Internal Server Error");
+    return res.render("signup.ejs", {
+      msgs: error.message,
+      link:link
+
+    });
   }
 });
 
@@ -162,8 +202,8 @@ app.post("/signup", async (req, res) => {
 app.get("/dashboard", checkAuth, async (req, res) => {
   //RoUTE TO
   const hashedUser = await bcrypt.hash(req.user.displayName, 10);
-  const status = req.query==undefined?"None":req.query
-  console.log(status)
+  const status = req.query == undefined ? "None" : req.query;
+  console.log(status);
   // return res.send(`http://localhost:3000/send?user=${hashedUser}`);
   return res.render(`dashboard.ejs`, {
     user: req.user.displayName,
